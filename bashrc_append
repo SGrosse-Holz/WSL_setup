@@ -1,0 +1,46 @@
+#
+# [SGH] Customizations appended to .bashrc by user_setup.sh
+#
+
+# Something like this should be in here already, but does not work for some reason
+if [ -r ~/.dircolors ]; then
+	eval $(dircolors -b ~/.dircolors)
+fi
+
+# byobu's bashrc
+# It mainly sets the prompt to nice colors and won't do anything outside of byobu
+source ~/.byobu_bashrc
+
+# match zathura color scheme to shell
+if [[ ! -z $BGCOLOR ]]; then
+	$(cd ~/.config/zathura && cp zathurarc_solarized-$BGCOLOR zathurarc)
+fi
+
+# Check whether there is a session d-bus running and start it if necessary
+# This is necessary e.g. for zathura synctex forward search
+DBUS_SESSION_BUS_ADDRESS=
+if [ -r ~/.dbus/session-bus/* ]
+then
+	source ~/.dbus/session-bus/*
+	if ! $(ps -Flww -p $DBUS_SESSION_BUS_PID | grep -q dbus-daemon)
+	then
+		DBUS_SESSION_BUS_ADDRESS=
+	fi
+fi
+if [[ -z $DBUS_SESSION_BUS_ADDRESS ]]
+then
+	# Note: it looks like this launches two dbus-daemon instances, though I
+	# have no idea why. It seems that there are persistently only two (no
+	# additional spawns when logging out and back in (closing WSL and
+	# opening new), etc. So this seems to be fine for now.
+	dbus-launch >/dev/null
+	source ~/.dbus/session-bus/*
+fi
+export DBUS_SESSION_BUS_ADDRESS
+
+alias vim='vim --servername vim' # make sure to have vim-gtk / vim-gtk3 installed
+
+# WSL starts up in powershell dir, so move home
+if [[ $(pwd) =~ WindowsPowerShell ]]; then
+	cd ~
+fi

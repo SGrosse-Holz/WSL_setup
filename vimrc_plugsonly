@@ -1,0 +1,5 @@
+call plug#begin('~/.vim/plugged')
+Plug 'lervag/vimtex'
+Plug 'altercation/vim-colors-solarized'
+Plug 'easymotion/vim-easymotion'
+call plug#end()

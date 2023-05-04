@@ -1,0 +1,112 @@
+source $VIMRUNTIME/vimrc_example.vim
+
+set backupdir=/tmp/vim,.
+set directory=/tmp/vim,.
+set undodir=/tmp/vim,.
+
+" to update: :r vimrc_plugsonly
+call plug#begin('~/.vim/plugged')
+Plug 'lervag/vimtex'
+Plug 'altercation/vim-colors-solarized'
+Plug 'easymotion/vim-easymotion'
+call plug#end()
+
+" easymotion stuff
+map <Space> <Plug>(easymotion-prefix)
+map <Space><Down> <Plug>(easymotion-j)
+map <Space><Up> <Plug>(easymotion-k)
+let g:EasyMotion_keys = 'ratiuglfvhcqxmpbzden'
+
+hi link EasyMotionTarget2First VimCommand
+hi link EasyMotionTarget2Second VimCommand
+hi link EasyMotionShade Comment
+
+" vimtex stuff
+let g:vimtex_view_method = 'zathura_simple'
+let g:vimtex_syntax_enabled = 0 " Let syntax highlighting be done by solarized
+
+" Solarized stuff
+call togglebg#map("<F11>")
+syntax enable
+let g:solarized_termcolors=16 "tell solarized that the terminal has the right palette
+let g:solarized_termtrans=0
+colorscheme solarized
+
+" WSL should set this appropriately
+if has_key(environ(), 'BGCOLOR')
+	exec 'set background=' . environ()['BGCOLOR']
+else
+	set background=dark
+endif
+
+" Make Neo arrow keys usable in visual mode
+vmap <Up> k
+vmap <Down> j
+vmap <Right> l
+vmap <Left> h
+
+" Follow tag
+map <C-P> <C-]>
+
+" Remap Umlaute to useful characters
+" Sometimes, for some reason, mapping the literal characters does not work. In
+" that case, use these alternatives:
+" ü = <char-252>
+" ö = <char-246> = <M-v>
+" ä = <char-228> = <M-d>
+map ü \
+map! ü \
+map ö $
+map! ö $
+map ä #
+map! ä #
+
+set scrolloff=2
+set linebreak
+set ruler
+set number
+set hlsearch
+set incsearch
+
+" Execute vim ex-commands stored as comments (first two characters of line are
+" ignored, i.e. can be used to make this a comment in whatever language you
+" are using)
+nmap <Leader>r 0ll"cy$:exec @c<CR>
+
+" Random stuff that should be put into different files
+
+function! Summarize_bib()
+	" collect all lines that start with an @ and append to the end of the
+	" buffer, prefixed with __. Delete everything __* at the end of the file
+	" before.
+	silent! global/^__/d
+	let entries = execute("g/^@/p", "silent!")
+	norm G
+	if len(getline(".")) > 0
+		norm o
+	endif
+	silent put =entries " For some reason this starts with a blank line
+	norm {dd0Gf@s__
+	g/^__/s/^__\w*{/__/
+	noh
+	norm G{VG
+	'<,'>sort
+	norm zt
+endfunction
+
+function! CopyMatches(reg)
+	let hits = []
+	%s//\=len(add(hits, submatch(0))) ? submatch(0) : ''/gne
+	let reg = empty(a:reg) ? '+' : a:reg
+	execute 'let @'.reg.' = join(hits, "\n") . "\n"'
+endfunction
+command! -register CopyMatches call CopyMatches(<q-reg>)
+
+function! SynName()
+	let l:s = synID(line('.'), col('.'), 1)
+	echo synIDattr(l:s, 'name') . ' --> ' . synIDattr(synIDtrans(l:s), 'name')
+endfunction
+
+function! TailThis()
+	autocmd BufReadPost <buffer> exec "normal! G"
+endfunction
