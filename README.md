@@ -23,3 +23,13 @@ does, or do individual steps manually
    layout](https://github.com/Rojetto/ReNeo/tree/master); a few mappings in
    `.vimrc` might make little sense with other layouts. Specifically,
    `g:EasyMotion_keys`.
+
+## Sources
+ - powershell solarized colors based on
+   [neilpa/cmd-colors-solarized](https://github.com/neilpa/cmd-colors-solarized)
+ - solarized `.dircolors` adapted from
+   [seebi/dircolors-solarized](https://github.com/seebi/dircolors-solarized)
+   (MIT License)
+ - zathura solarized colors based on
+   [lennonwoo/zathura-solarized](https://github.com/lennonwoo/zathura-solarized)
+   (MIT License)
